@@ -36,7 +36,8 @@ export default function FloatingCircle() {
     setActiveItem(current);
   }, [pathname]);
 
-  const handleDragStart = useCallback(
+  // 🖱️ بداية السحب بالماوس
+  const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       setIsDragging(true);
       e.preventDefault();
@@ -44,7 +45,8 @@ export default function FloatingCircle() {
     []
   );
 
-  const handleDrag = useCallback(
+  // 🖱️ حركة السحب بالماوس
+  const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       if (!isDragging) return;
       setPosition({
@@ -55,19 +57,62 @@ export default function FloatingCircle() {
     [isDragging]
   );
 
-  const handleDragEnd = useCallback(() => {
+  // 🖱️ نهاية السحب بالماوس
+  const handleMouseUp = useCallback(() => {
     setIsDragging(false);
   }, []);
 
+  // 📱 بداية السحب باللمس
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent<HTMLDivElement>) => {
+      setIsDragging(true);
+      // منع الـ scrolling أثناء السحب
+      e.preventDefault();
+    },
+    []
+  );
+
+  // 📱 حركة السحب باللمس
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+      setPosition({
+        x: touch.clientX - 28,
+        y: touch.clientY - 28,
+      });
+      // منع تحرك الصفحة أثناء السحب
+      e.preventDefault();
+    },
+    [isDragging]
+  );
+
+  // 📱 نهاية السحب باللمس
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // ربط أحداث الماوس + اللمس على document عندما نكون في حالة سحب
   useEffect(() => {
     if (!isDragging) return;
-    document.addEventListener("mousemove", handleDrag);
-    document.addEventListener("mouseup", handleDragEnd);
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    document.addEventListener("touchmove", handleTouchMove, {
+      passive: false,
+    } as EventListenerOptions);
+    document.addEventListener("touchend", handleTouchEnd);
+
     return () => {
-      document.removeEventListener("mousemove", handleDrag);
-      document.removeEventListener("mouseup", handleDragEnd);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [isDragging, handleDrag, handleDragEnd]);
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
   const toggleMenu = useCallback(() => {
     if (!isDragging) setIsOpen((prev) => !prev);
@@ -104,7 +149,10 @@ export default function FloatingCircle() {
           cursor-move select-none text-white
         `}
         style={{ left: position.x, top: position.y }}
-        onMouseDown={handleDragStart}
+        // 🖱️ للكمبيوتر
+        onMouseDown={handleMouseDown}
+        // 📱 للهاتف
+        onTouchStart={handleTouchStart}
         onClick={toggleMenu}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.96 }}
