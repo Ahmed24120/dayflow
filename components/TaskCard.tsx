@@ -1,14 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { FaCheck } from "react-icons/fa";
-
-interface Task {
-  id: number;
-  title: string;
-  completed: boolean;
-  type: string;
-}
+import type { Task } from "@/components/TasksContext";
+import { useTasks } from "@/components/TasksContext";
 
 const typeColors: Record<string, string> = {
   work: "bg-blue-500",
@@ -17,26 +11,24 @@ const typeColors: Record<string, string> = {
 };
 
 export default function TaskCard({ task }: { task: Task }) {
-  const [completed, setCompleted] = useState(task.completed);
-
-  const toggleCompleted = () => {
-    setCompleted(!completed);
-  };
+  const { toggleTask } = useTasks();
 
   return (
-    <div className="flex items-center p-4 bg-slate-800/30 rounded-xl hover:bg-slate-800/50 transition">
+    <div className="flex items-center p-3 sm:p-4 bg-slate-900/3 bg-white/80 rounded-xl border border-gray-200 hover:shadow-sm transition">
       <button
-        onClick={toggleCompleted}
-        className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 ${
-          completed ? "bg-green-500" : "border-2 border-slate-600"
+        onClick={() => toggleTask(task.id)}
+        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center mr-3 sm:mr-4 ${
+          task.completed
+            ? "bg-emerald-500"
+            : "border-2 border-gray-300 bg-white"
         }`}
       >
-        {completed && <FaCheck className="text-white" />}
+        {task.completed && <FaCheck className="text-white text-xs" />}
       </button>
       <div className="flex-1">
         <p
-          className={`text-slate-200 ${
-            completed ? "line-through text-slate-500" : ""
+          className={`text-sm sm:text-base text-gray-900 ${
+            task.completed ? "line-through text-gray-400" : ""
           }`}
         >
           {task.title}
@@ -44,7 +36,7 @@ export default function TaskCard({ task }: { task: Task }) {
       </div>
       <div
         className={`w-3 h-3 rounded-full ${
-          typeColors[task.type] || "bg-gray-500"
+          typeColors[task.type] || "bg-gray-400"
         }`}
       />
     </div>

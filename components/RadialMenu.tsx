@@ -1,6 +1,7 @@
+// components/RadialMenu.tsx
 "use client";
 
-import { ReactNode } from "react";
+import type { ReactNode, CSSProperties } from "react";
 
 interface RadialMenuItem {
   icon: ReactNode;
@@ -16,7 +17,13 @@ interface RadialMenuProps {
   onItemClick: (path: string) => void;
 }
 
-export default function RadialMenu({ isOpen, centerX, centerY, items, onItemClick }: RadialMenuProps) {
+export default function RadialMenu({
+  isOpen,
+  centerX,
+  centerY,
+  items,
+  onItemClick,
+}: RadialMenuProps) {
   if (!isOpen) return null;
 
   const radius = 100;
@@ -29,9 +36,7 @@ export default function RadialMenu({ isOpen, centerX, centerY, items, onItemClic
         const x = centerX + radius * Math.cos(angle) - 20;
         const y = centerY + radius * Math.sin(angle) - 20;
 
-        // Création d'un objet style avec un index de type string
-        // pour éviter l'erreur TypeScript avec les propriétés CSS personnalisées
-        const buttonStyle: React.CSSProperties & {
+        const buttonStyle: CSSProperties & {
           [key: string]: string | number;
         } = {
           left: `${x}px`,
@@ -39,16 +44,12 @@ export default function RadialMenu({ isOpen, centerX, centerY, items, onItemClic
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
         };
 
-        // Ajout des propriétés CSS personnalisées si nécessaire
-        // Si vous utilisez ces propriétés dans votre CSS
-        if (typeof document !== 'undefined' && 'style' in document.documentElement) {
-          buttonStyle['--tx'] = `${radius * Math.cos(angle)}px`;
-          buttonStyle['--ty'] = `${radius * Math.sin(angle)}px`;
-        }
+        buttonStyle["--tx"] = `${radius * Math.cos(angle)}px`;
+        buttonStyle["--ty"] = `${radius * Math.sin(angle)}px`;
 
         return (
           <button
-            key={index}
+            key={item.label}
             className="absolute w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-white text-xl shadow-lg pointer-events-auto radial-item"
             style={buttonStyle}
             onClick={() => onItemClick(item.path)}

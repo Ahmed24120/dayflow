@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import FloatingCircle from "@/components/FloatingCircle";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Dayflow",
@@ -17,9 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
-        {children}
-        <FloatingCircle />
+      <body className="antialiased bg-slate-50">
+        <Providers>
+          {children}
+          <FloatingCircle />
+        </Providers>
       </body>
     </html>
   );
